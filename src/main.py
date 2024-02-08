@@ -49,7 +49,7 @@ class OpenSeaScraper:
 
             try:
                 image = Image.open(BytesIO(image))
-                image.thumbnail((256, 256))
+                image.thumbnail((400, 400))
                 output_path = os.path.join(OUTPUTS_DIR, "pfps", f"{safe_name}.png")
                 image.save(output_path, format="PNG")
 
