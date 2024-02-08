@@ -43,18 +43,21 @@ class OpenSeaScraper:
         random_collections = random.sample(collections, self.PFP_amount)
         random_collections_with_image = self.download_images_to_collections(random_collections)
 
-        for collection in random_collections_with_image:
+        logger.info("Saving images")
+        for index, collection in enumerate(random_collections_with_image):
+            if index % 10 == 0:
+                logger.info(f"Saving image number {index}")
             safe_name = secure_filename(collection["name"])
             image = collection["image"]
 
             try:
                 image = Image.open(BytesIO(image))
-                image.thumbnail((400, 400))
+                image.thumbnail((256, 256))
                 output_path = os.path.join(OUTPUTS_DIR, "pfps", f"{safe_name}.png")
                 image.save(output_path, format="PNG")
 
             except UnidentifiedImageError as err:
-                logger.error(f"Weird image format, skipping: {err}")
+                logger.error(f"Weird image format, skipping nr {index}: {err}")
 
             except Exception as err:
                 logger.exception(f"Error: {err}, {output_path}")
@@ -81,13 +84,11 @@ class OpenSeaScraper:
 
             return response.content
 
-        counter = 0
         logger.info("Downloading images to collections")
-        for collection in collections:
-            counter += 1
+        for index, collection in enumerate(collections):
             time.sleep(0.5)
-            if counter % 10 == 0 or counter == 1:
-                logger.info(f"Downloading image number {counter}")
+            if index % 10 == 0:
+                logger.info(f"Downloading image number {index}")
 
             try:
                 url = collection["collection_image_url"]
