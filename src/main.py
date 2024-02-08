@@ -4,11 +4,13 @@ import random
 import time
 import typing as tp
 from io import BytesIO
+
 import requests
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 from dotenv import load_dotenv
 from requests.exceptions import Timeout as RequestsTimeoutException
 from werkzeug.utils import secure_filename
+
 from src.utils.dir_paths import OUTPUTS_DIR
 from src.utils.logger_custom import default_logger as logger
 
@@ -16,13 +18,11 @@ from src.utils.logger_custom import default_logger as logger
 class OpenSeaScraper:
     def __init__(self):
         load_dotenv()
-        self.PFP_amount = 100
-        self.COLLECTIONS_LIMIT = self.PFP_amount * 2  # For some randomness
+        self.PFP_amount = 200
+        self.COLLECTIONS_LIMIT = self.PFP_amount * 10  # For some randomness, doesn't take that much longer
         self.TIMEOUT = 5
         self.base_url = "https://api.opensea.io/api/v2"
         self.api_key = os.getenv("OPENSEA_API_KEY")
-        self.headless = False
-        self.detach = True
 
     def _send_request(self, url: str, params: dict = tp.Optional):
         """Sends a request to the OpenSea API with API"""
@@ -40,8 +40,8 @@ class OpenSeaScraper:
     def scrape_and_save(self) -> None:
         """Main function, save all the random NFT pfp's"""
         collections = self.get_collections()
-        collections_with_image = self.download_images_to_collections(collections)
-        random_collections_with_image = random.sample(collections_with_image, self.PFP_amount)
+        random_collections = random.sample(collections, self.PFP_amount)
+        random_collections_with_image = self.download_images_to_collections(random_collections)
 
         for collection in random_collections_with_image:
             safe_name = secure_filename(collection["name"])
@@ -51,10 +51,13 @@ class OpenSeaScraper:
                 image = Image.open(BytesIO(image))
                 image.thumbnail((256, 256))
                 output_path = os.path.join(OUTPUTS_DIR, "pfps", f"{safe_name}.png")
-                image.save(output_path)
+                image.save(output_path, format="PNG")
+
+            except UnidentifiedImageError as err:
+                logger.error(f"Weird image format, skipping: {err}")
 
             except Exception as err:
-                logger.exception(f"Error: {err}")
+                logger.exception(f"Error: {err}, {output_path}")
 
         logger.success("Finished saving all PFP's")
 
@@ -99,9 +102,9 @@ class OpenSeaScraper:
                 logger.error(f"Request error fetching image: {err}, {collection['name']}, {url}")
 
             except Exception as err:
-                logger.exception(f"Error: {err}")
+                logger.exception(f"Error: {err}, {collection['name']}, {url}")
 
-        collections_with_image = [collection for collection in collections if collection["image"]]
+        collections_with_image = [collection for collection in collections if "image" in collection and collection["image"]]
 
         return collections_with_image
 
@@ -124,7 +127,7 @@ class OpenSeaScraper:
                     "description": collection["description"],
                     "project_url": collection["project_url"],
                     "collection_image_url": collection["image_url"]
-                } for collection in data["collections"] if collection["image_url"]]
+                } for collection in data["collections"] if "http" in collection["image_url"]]
             )
 
             next_str = data.get("next")  # Get the URL for the next page (if any)
