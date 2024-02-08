@@ -46,7 +46,7 @@ class OpenSeaScraper:
         logger.info("Saving images")
         for index, collection in enumerate(random_collections_with_image):
             if index % 10 == 0:
-                logger.info(f"Saving image number {index}")
+                logger.info(f"Saving image number {index}...")
             safe_name = secure_filename(collection["name"])
             image = collection["image"]
 
@@ -88,7 +88,7 @@ class OpenSeaScraper:
         for index, collection in enumerate(collections):
             time.sleep(0.5)
             if index % 10 == 0:
-                logger.info(f"Downloading image number {index}")
+                logger.info(f"Downloading image number {index}...")
 
             try:
                 url = collection["collection_image_url"]
@@ -106,6 +106,7 @@ class OpenSeaScraper:
                 logger.exception(f"Error: {err}, {collection['name']}, {url}")
 
         collections_with_image = [collection for collection in collections if "image" in collection and collection["image"]]
+        logger.success("Downloaded all images")
 
         return collections_with_image
 
@@ -117,9 +118,9 @@ class OpenSeaScraper:
         }
         url = f"{self.base_url}/collections"
 
-        logger.info("Getting top collections info...")
+        logger.info("Getting top collections info")
         while len(collections) < self.COLLECTIONS_LIMIT:
-            logger.info(f"Getting collection number {len(collections) + 1}")
+            logger.info(f"Getting collection number {len(collections) + 1}...")
             data = self._send_request(url, params)
             collections.extend(
                 [{
