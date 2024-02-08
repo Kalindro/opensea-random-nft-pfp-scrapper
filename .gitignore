@@ -133,4 +133,5 @@ cython_debug/
 
 # Project
 outputs/pfps/*
+!outputs/pfps/*
 
