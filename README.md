@@ -16,9 +16,7 @@ as currently a lot of downloaded images are shit.
 
 ___
 
-
-You need to provide OpenSea API key in .env file (.env.example as example). It's easy to get, nowadays you receive it instantly.
-
+Regular poetry install. You need to provide OpenSea API key in .env file (.env.example as example). It's easy to get, nowadays you receive it instantly.
 ___
 
 Main running file: [src/main.py](src/main.py).  
