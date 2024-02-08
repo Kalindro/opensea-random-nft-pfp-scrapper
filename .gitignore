@@ -133,5 +133,5 @@ cython_debug/
 
 # Project
 outputs/pfps/*
-!outputs/pfps/*
+!outputs/pfps/.gitkeep
 
