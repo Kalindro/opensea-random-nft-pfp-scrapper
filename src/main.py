@@ -17,12 +17,15 @@ from src.utils.logger_custom import default_logger as logger
 
 class OpenSeaScraper:
     def __init__(self):
+        # ### # Static settings # ### #
         load_dotenv()
+        self.TIMEOUT = 5
+        self.api_key = os.getenv("OPENSEA_API_KEY")
+        self.base_url = "https://api.opensea.io/api/v2"
+
+        # ### # General # ### #
         self.PFP_amount = 200
         self.COLLECTIONS_LIMIT = self.PFP_amount * 10  # For some randomness, doesn't take that much longer
-        self.TIMEOUT = 5
-        self.base_url = "https://api.opensea.io/api/v2"
-        self.api_key = os.getenv("OPENSEA_API_KEY")
 
     def _send_request(self, url: str, params: dict = tp.Optional):
         """Sends a request to the OpenSea API with API"""
