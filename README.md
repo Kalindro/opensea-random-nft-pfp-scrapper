@@ -1,4 +1,4 @@
-## Opensea Random NFT PFP Scrapper
+# Opensea Random NFT PFP Scrapper
 
 Simple tool to scrap random NFT's (actually collections images, it's much faster than additionally checking for image of actual collections NFT's).  
 They can be used as Discord/Twitter profile pictures, very useful for people with, for some reason, a lot of accounts :)  
